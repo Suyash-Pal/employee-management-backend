@@ -31,9 +31,12 @@ router.post("/", async (req, res) => {
 // GET /api/attendance/:date → Get attendance for a date
 router.get("/:date", async (req, res) => {
   try {
-    const requestedDate = req.params.date;
+    const requestedDate = req.params.date; // "2026-01-02"
+
+    // Find attendance by exact string
     const attendance = await Attendance.findOne({ date: requestedDate });
 
+    // If no document found, return empty records
     if (!attendance) {
       return res.status(200).json({ records: [] });
     }
