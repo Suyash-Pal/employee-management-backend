@@ -14,9 +14,12 @@ mongoose
 
 const employeeRoutes = require("./routes/employee.routes");
 const attendanceRoutes = require("./routes/attendance.routes");
+const salaryRoutes = require("./routes/salary.routes");
+
 
 app.use("/api/employees", employeeRoutes);
 app.use("/api/attendance", attendanceRoutes);
+app.use("/api/salary", salaryRoutes);
 
 const PORT = 5000;
 app.listen(PORT, () => {
