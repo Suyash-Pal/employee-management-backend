@@ -31,3 +31,33 @@ exports.getAttendanceByMonth = async (req, res) => {
 
   res.json(attendance);
 };
+
+exports.getMonthlyAttendanceSummary = async (req, res) => {
+  try {
+    const { employeeId, month } = req.params;
+    // month will be like "2026-01"
+
+    const records = await Attendance.find({
+      employeeId,
+      date: { $regex: `^${month}` }
+    });
+
+    let presentDays = 0;
+    let paidLeaves = 0;
+    let unpaidLeaves = 0;
+
+    records.forEach((r) => {
+      if (r.status === "PRESENT") presentDays++;
+      if (r.status === "PAID_LEAVE") paidLeaves++;
+      if (r.status === "UNPAID_LEAVE") unpaidLeaves++;
+    });
+
+    res.json({
+      presentDays,
+      paidLeaves,
+      unpaidLeaves
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

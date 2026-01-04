@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Attendance = require("../models/Attendance.model");
+const getMonthlyAttendanceSummary = require("../controllers/attendance.controller").getMonthlyAttendanceSummary;
 
 router.post("/", async (req, res) => {
   try {
@@ -42,5 +43,9 @@ router.get("/:date", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+
+
+router.get("/summary/:employeeId/:month", getMonthlyAttendanceSummary);
+
 
 module.exports = router;
