@@ -35,11 +35,18 @@ exports.getAttendanceByMonth = async (req, res) => {
 exports.getMonthlyAttendanceSummary = async (req, res) => {
   try {
     const { employeeId, month } = req.params;
-    // month will be like "2026-01"
+    // month = "2026-01"
+
+    const startDate = new Date(`${month}-01`);
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + 1);
 
     const records = await Attendance.find({
       employeeId,
-      date: { $regex: `^${month}` }
+      date: {
+        $gte: startDate,
+        $lt: endDate
+      }
     });
 
     let presentDays = 0;
