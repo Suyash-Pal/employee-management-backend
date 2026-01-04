@@ -42,12 +42,11 @@ exports.getMonthlyAttendanceSummary = async (req, res) => {
     endDate.setMonth(endDate.getMonth() + 1);
 
     const records = await Attendance.find({
-      employeeId,
-      date: {
-        $gte: startDate,
-        $lt: endDate
-      }
-    });
+  employeeId,
+  date: {
+    $regex: `^${month}-`
+  }
+});
 
     let presentDays = 0;
     let paidLeaves = 0;
