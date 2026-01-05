@@ -20,7 +20,6 @@ exports.markAttendance = async (req, res) => {
 // Get attendance for a month
 exports.getAttendanceByMonth = async (req, res) => {
   const { month } = req.query; // YYYY-MM
-
   const startDate = new Date(`${month}-01`);
   const endDate = new Date(startDate);
   endDate.setMonth(endDate.getMonth() + 1);
@@ -34,28 +33,34 @@ exports.getAttendanceByMonth = async (req, res) => {
 
 exports.getMonthlyAttendanceSummary = async (req, res) => {
   try {
+    
     const { employeeId, month } = req.params;
-    // month = "2026-01"
 
-    const startDate = new Date(`${month}-01`);
-    const endDate = new Date(startDate);
-    endDate.setMonth(endDate.getMonth() + 1);
+    const [year, monthNum] = month.split("-");
 
-    const records = await Attendance.find({
-  employeeId,
-  date: {
-    $regex: `^${month}-`
-  }
-});
+    const startDate = new Date(Date.UTC(year, monthNum - 1, 1));
+    const endDate = new Date(Date.UTC(year, monthNum, 1));
+
+    const attendanceDocs = await Attendance.find({
+      date: {
+  $regex: `^${month}`
+}
+    });
 
     let presentDays = 0;
     let paidLeaves = 0;
     let unpaidLeaves = 0;
+    
+    attendanceDocs.forEach((dayDoc) => {
+      const record = dayDoc.records.find(
+        (r) => r.employeeId.toString() === employeeId
+      );
 
-    records.forEach((r) => {
-      if (r.status === "PRESENT") presentDays++;
-      if (r.status === "PAID_LEAVE") paidLeaves++;
-      if (r.status === "UNPAID_LEAVE") unpaidLeaves++;
+      if (!record) return;
+      
+      if (record.status === "PRESENT") presentDays++;
+      if (record.status === "PAID_LEAVE") paidLeaves++;
+      if (record.status === "UNPAID_LEAVE") unpaidLeaves++;
     });
 
     res.json({
